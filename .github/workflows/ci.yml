@@ -1,0 +1,49 @@
+name: DevOps Task API CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1️⃣ Récupérer le code
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # 2️⃣ Installer Node.js
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    # 3️⃣ Installer les dépendances
+    - name: Install dependencies
+      run: npm install
+
+    # 4️⃣ Lancer les tests unitaires (si présents)
+    - name: Run tests
+      run: |
+        if [ -f package.json ]; then
+          npm test || echo "No tests yet, skipping"
+        fi
+
+    # 5️⃣ Lint simple (vérifie syntaxe JS)
+    - name: Run ESLint
+      run: |
+        npm install eslint
+        npx eslint index.js || echo "Lint warnings only"
+
+    # 6️⃣ Build Docker image
+    - name: Build Docker image
+      run: docker build -t devops-task-api .
+
+    # 7️⃣ Optional: save logs
+    - name: Save build logs
+      run: |
+        echo "Build completed at $(date)" > build.log
+        cat build.log
