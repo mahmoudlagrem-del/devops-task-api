@@ -113,3 +113,4 @@ app.delete("/tasks/:id", (req, res) => {
 app.listen(3000, () => {
   console.log("DevOps Task API running on http://localhost:3000");
 });
+module.exports = app; 
