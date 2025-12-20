@@ -1,38 +1,65 @@
 const express = require("express");
-const app = express();
+const client = require('prom-client');
+const winston = require('winston');
+const { v4: uuidv4 } = require('uuid');
 
+const app = express();
 app.use(express.json());
 
+// ----------------- Observabilité -----------------
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics();
 
-let tasks = [];
-let requestCount = 0;
+// Compteur HTTP Prometheus
+const httpRequestCounter = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+  labelNames: ['method', 'route', 'status']
+});
 
-// Middleware observabilité
+// Logger structuré
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.Console()
+  ]
+});
+
+// Middleware pour logs et tracing
 app.use((req, res, next) => {
-  requestCount++;
-  req.traceId = Math.random().toString(36).substring(2, 10);
+  req.traceId = uuidv4();
 
-  console.log({
-    traceId: req.traceId,
-    method: req.method,
-    path: req.path,
-    time: new Date().toISOString()
+  res.on('finish', () => {
+    httpRequestCounter.labels(req.method, req.path, res.statusCode).inc();
+    logger.info({
+      traceId: req.traceId,
+      method: req.method,
+      path: req.path,
+      status: res.statusCode,
+      time: new Date().toISOString()
+    });
   });
 
+  res.setHeader('X-Trace-ID', req.traceId);
   next();
 });
 
+// ----------------- Data -----------------
+let tasks = [];
+let nextId = 1;
+
+// ----------------- Endpoints -----------------
+
 // Health check
 app.get("/health", (req, res) => {
-  res.json({ status: "UP" });
+  res.status(200).json({ status: "UP" });
 });
 
 // Metrics
-app.get("/metrics", (req, res) => {
-  res.json({
-    requests: requestCount,
-    tasks: tasks.length
-  });
+app.get("/metrics", async (req, res) => {
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
 });
 
 // Get all tasks
@@ -55,7 +82,7 @@ app.post("/tasks", (req, res) => {
   }
 
   const task = {
-    id: tasks.length + 1,
+    id: nextId++,
     title,
     completed: false,
     createdAt: new Date().toISOString()
@@ -109,8 +136,13 @@ app.delete("/tasks/:id", (req, res) => {
   });
 });
 
-// Start server
-app.listen(3000, () => {
-  console.log("DevOps Task API running on http://localhost:3000");
-});
-module.exports = app; 
+// ----------------- Export pour tests -----------------
+module.exports = app;
+
+// ----------------- Serveur -----------------
+if (require.main === module) {
+  const PORT = 3000;
+  app.listen(PORT, () => {
+    console.log(`DevOps Task API running on http://localhost:${PORT}`);
+  });
+}
