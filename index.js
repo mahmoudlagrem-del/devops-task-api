@@ -1,14 +1,7 @@
-// index.js
-
-
 const express = require("express")
 const client = require("prom-client");
 const winston = require("winston");
 const { v4: uuidv4 } = require('uuid');
-
-
-
-
 
 const app = express();
 app.use(express.json());
@@ -57,6 +50,11 @@ let nextId = 1;
 
 // ----------------- Endpoints -----------------
 
+// Root endpoint (pour DAST scanner)
+app.get("/", (req, res) => {
+  res.status(200).send("DevOps Task API is running");
+});
+
 // Health check
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "UP" });
@@ -66,6 +64,11 @@ app.get("/health", (req, res) => {
 app.get("/metrics", async (req, res) => {
   res.set("Content-Type", client.register.contentType);
   res.end(await client.register.metrics());
+});
+
+// Robots.txt minimal (évite 404)
+app.get("/robots.txt", (req, res) => {
+  res.type('text/plain').send('User-agent: *\nDisallow:');
 });
 
 // Get all tasks
