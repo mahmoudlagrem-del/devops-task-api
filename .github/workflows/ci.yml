@@ -43,6 +43,11 @@ jobs:
         run: |
           npm install eslint
           npx eslint index.js || echo "Lint warnings only"
+          
+      - name: Fix permissions for ZAP
+        run: chmod -R a+w .
+
+
 
       # 7️⃣ Start API (required for DAST)
       - name: Start API
