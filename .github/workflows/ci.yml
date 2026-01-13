@@ -29,20 +29,41 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 4️⃣ Run tests (Jest)
+      # 🔐 4️⃣ SAST - Static Application Security Testing
+      - name: Run SAST (npm audit)
+        run: npm audit --audit-level=high
+
+      # 5️⃣ Run tests
       - name: Run Jest tests
         run: npm test
 
-      # 5️⃣ Run ESLint (optionnel mais recommandé)
+      # 6️⃣ Lint code
       - name: Lint code
         run: |
           npm install eslint
           npx eslint index.js || echo "Lint warnings only"
+<<<<<<< HEAD
       # 6️⃣ Build Docker image
+=======
+
+      # ▶️ 7️⃣ Start API (required for DAST)
+      - name: Start API
+        run: |
+          node index.js &
+          sleep 10
+
+      # 🔎 8️⃣ DAST - OWASP ZAP
+      - name: Run DAST scan
+        uses: zaproxy/action-baseline@v0.9.0
+        with:
+          target: http://localhost:3000
+
+      # 9️⃣ Build Docker image
+>>>>>>> 42fac38 (add sast and dast security checks)
       - name: Build Docker image
         run: docker build -t devops-task-api .
 
-      # 7️⃣ Save logs
+      # 🔟 Save logs
       - name: Save build logs
         run: |
           echo "Build completed at $(date)" > build.log
