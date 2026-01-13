@@ -38,7 +38,6 @@ jobs:
         run: |
           npm install eslint
           npx eslint index.js || echo "Lint warnings only"
-
       # 6️⃣ Build Docker image
       - name: Build Docker image
         run: docker build -t devops-task-api .
