@@ -15,43 +15,57 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: 'npm'
 
+      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: npm ci
 
+      # 4️⃣ Run SAST (Static Analysis)
       - name: Run SAST (npm audit)
         run: npm audit --audit-level=high
 
+      # 5️⃣ Run Jest tests
       - name: Run Jest tests
         run: ./node_modules/.bin/jest --detectOpenHandles
 
+      # 6️⃣ Lint code
       - name: Lint code
         run: |
           npm install eslint
           npx eslint index.js || echo "Lint warnings only"
 
-      # ▶️ Start API (required for DAST)
+      # 7️⃣ Start API (required for DAST)
       - name: Start API
         run: |
+          # Start API in the background
           node index.js &
-          sleep 10
+          # Wait for API to be ready
+          sleep 15
 
+      # 8️⃣ Run DAST scan with ZAP
       - name: Run DAST scan
         uses: zaproxy/action-baseline@v0.9.0
         with:
-          target: http://localhost:3000
+          target: http://localhost:3000/health   # Use a valid endpoint to avoid 404
+          json_report: report_json.json
+          markdown_report: report_md.md
+          html_report: report_html.html
 
+      # 9️⃣ Build Docker image
       - name: Build Docker image
         run: docker build -t devops-task-api .
 
+      # 🔟 Save build logs
       - name: Save build logs
         run: |
           echo "Build completed at $(date)" > build.log
