@@ -63,6 +63,18 @@ jobs:
           cmd_options: -J report_json.json -w report_md.md -r report_html.html
           artifact_name: zap-report
 
+
+      - name: Upload ZAP reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-reports
+          path: |
+            report_json.json
+            report_md.md
+            report_html.html
+     
+
+
       # 9️⃣ Build Docker image
       - name: Build Docker image
         run: docker build -t devops-task-api .
