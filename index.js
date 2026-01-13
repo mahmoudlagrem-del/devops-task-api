@@ -1,9 +1,20 @@
 // index.js
 
+<<<<<<< HEAD
 const express = require("express");
 const client = require("prom-client");
 const winston = require("winston");
 const { v4: uuidv4 } = require('uuid');
+=======
+const express = require("express")
+const client = require("prom-client");
+const winston = require("winston");
+const { v4: uuidv4 } = require('uuid');
+
+const client = require('prom-client');
+const winston = require('winston');
+const { v4: uuidv4 } = require("uuid");
+>>>>>>> 392a17c (Fix CI/CD pipeline with Node + ZAP)
 
 
 
