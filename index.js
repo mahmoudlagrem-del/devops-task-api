@@ -1,9 +1,16 @@
 // index.js
 
 const express = require("express");
+<<<<<<< HEAD
 const client = require("prom-client");
 const winston = require("winston");
 const { v4: uuidv4 } = require('uuid');
+=======
+const client = require('prom-client');
+const winston = require('winston');
+const { v4: uuidv4 } = require("uuid");
+
+>>>>>>> ea18da8 (Add CI/CD pipeline workflow)
 
 const app = express();
 app.use(express.json());

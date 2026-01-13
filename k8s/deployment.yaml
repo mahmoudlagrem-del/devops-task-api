@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-task-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devops-task-api
+  template:
+    metadata:
+      labels:
+        app: devops-task-api
+    spec:
+      containers:
+        - name: api
+          image: devops-task-api:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
