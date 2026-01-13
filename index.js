@@ -1,36 +1,37 @@
-const express = require("express");
-const client = require('prom-client');
-const winston = require('winston');
+// index.js
 
+const express = require("express");
+const client = require("prom-client");
+const winston = require("winston");
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 app.use(express.json());
 
 // ----------------- Observabilité -----------------
-const collectDefaultMetrics = client.collectDefaultMetrics;
-collectDefaultMetrics();
+
+// Collecte des metrics par défaut
+client.collectDefaultMetrics();
 
 // Compteur HTTP Prometheus
 const httpRequestCounter = new client.Counter({
-  name: 'http_requests_total',
-  help: 'Total number of HTTP requests',
-  labelNames: ['method', 'route', 'status']
+  name: "http_requests_total",
+  help: "Total number of HTTP requests",
+  labelNames: ["method", "route", "status"]
 });
 
 // Logger structuré
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.json(),
-  transports: [
-    new winston.transports.Console()
-  ]
+  transports: [new winston.transports.Console()]
 });
 
-// Middleware pour logs et tracing
+// Middleware logs + tracing
 app.use((req, res, next) => {
   req.traceId = uuidv4();
 
-  res.on('finish', () => {
+  res.on("finish", () => {
     httpRequestCounter.labels(req.method, req.path, res.statusCode).inc();
     logger.info({
       traceId: req.traceId,
@@ -41,7 +42,7 @@ app.use((req, res, next) => {
     });
   });
 
-  res.setHeader('X-Trace-ID', req.traceId);
+  res.setHeader("X-Trace-ID", req.traceId);
   next();
 });
 
@@ -58,7 +59,7 @@ app.get("/health", (req, res) => {
 
 // Metrics
 app.get("/metrics", async (req, res) => {
-  res.set('Content-Type', client.register.contentType);
+  res.set("Content-Type", client.register.contentType);
   res.end(await client.register.metrics());
 });
 
