@@ -38,6 +38,11 @@ jobs:
           npm install eslint
           npx eslint index.js || echo "Lint warnings only"
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+      # ▶️ 7️⃣ Start API (required for DAST)
+>>>>>>> dfccf84 (add deployement in k8s)
       - name: Start API
         run: |
           node index.js &
@@ -51,6 +56,18 @@ jobs:
       - name: Build Docker image
         run: docker build -t devops-task-api .
 
+<<<<<<< HEAD
+=======
+      # 🔟 Save logs
+=======
+      # 7️⃣ Build Docker image
+>>>>>>> 4a685e4 (add sast and dast security checks)
+      - name: Build Docker image
+        run: docker build -t devops-task-api .
+
+      # 8️⃣ Save logs
+>>>>>>> 80b39fe (add sast and dast)
+>>>>>>> dfccf84 (add deployement in k8s)
       - name: Save build logs
         run: |
           echo "Build completed at $(date)" > build.log
