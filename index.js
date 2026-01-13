@@ -1,7 +1,7 @@
 const express = require("express");
 const client = require('prom-client');
 const winston = require('winston');
-const { v4: uuidv4 } = require('uuid');
+
 
 const app = express();
 app.use(express.json());
