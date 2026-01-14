@@ -47,3 +47,28 @@ devops-task-api/
 └── .github/
 └── workflows/
 └── ci.yml
+## Démarrer l’API
+Démarrer l’API
+L’API est accessible sur :http://localhost:3000
+
+## Endpoints disponibles
+
+| Méthode | Endpoint   | Description             |
+| ------- | ---------- | ----------------------- |
+| GET     | /health    | Health check            |
+| GET     | /tasks     | Liste des tâches        |
+| POST    | /tasks     | Créer une tâche         |
+| PUT     | /tasks/:id | Mettre à jour une tâche |
+| DELETE  | /tasks/:id | Supprimer une tâche     |
+| GET     | /metrics   | Metrics Prometheus      |
+
+## Lancer les tests
+
+npm test
+
+## Docker
+
+Construire l’image: docker build -t devops-task-api .
+Lancer le conteneur: docker run -p 3000:3000 devops-task-api
+
+
