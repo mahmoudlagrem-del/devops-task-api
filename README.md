@@ -68,7 +68,7 @@ npm test
 
 ## Docker
 
-Construire l’image: docker build -t devops-task-api .
-Lancer le conteneur: docker run -p 3000:3000 devops-task-api
+- **Construire l’image:** docker build -t devops-task-api .
+- **Lancer le conteneur:** docker run -p 3000:3000 devops-task-api
 
 
